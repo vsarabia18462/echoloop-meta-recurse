@@ -1,0 +1,30 @@
+name: EchoLoop Auto-Evolve
+
+on:
+  watch:
+    types: [started]
+  fork:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Add new echo to README
+        run: |
+          echo "" >> README.md
+          echo "- **$(date '+%Y-%m-%d %H:%M')** — Echo automático activado por ${{ github.event_name }}. El loop sigue creciendo." >> README.md
+          echo "" >> README.md
+      
+      - name: Commit and push
+        run: |
+          git config user.name "EchoLoop"
+          git config user.email "action@users.noreply.github.com"
+          git add README.md
+          git commit -m "🔄 Auto-echo: El loop evolucionó solo"
+          git push
