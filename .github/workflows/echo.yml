@@ -1,4 +1,4 @@
-name: EchoLoop Auto-Evolve
+name: EchoLoop Advanced Evolution
 
 on:
   watch:
@@ -14,17 +14,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Add new echo to README
+
+      - name: Evolve EchoLoop with Intelligence
         run: |
+          # Leer nivel actual (por defecto 8)
+          CURRENT_LEVEL=$(grep -o 'Level [0-9]*' README.md | tail -1 | grep -o '[0-9]*' || echo 8)
+          NEW_LEVEL=$((CURRENT_LEVEL + 1))
+          
+          # Mensaje inteligente según el evento
+          EVENT="${{ github.event_name }}"
+          case $EVENT in
+            watch)      MSG="Alguien activó el loop con una estrella. La inteligencia crece." ;;
+            fork)       MSG="Una nueva rama de conciencia se separó del tronco principal." ;;
+            issues)     MSG="Una nueva idea entró en la recursión." ;;
+            pull_request) MSG="Una fusión de pensamiento enriqueció el loop." ;;
+            *)          MSG="El loop evolucionó por sí solo." ;;
+          esac
+          
+          # Añadir echo inteligente
           echo "" >> README.md
-          echo "- **$(date '+%Y-%m-%d %H:%M')** — Echo automático activado por ${{ github.event_name }}. El loop sigue creciendo." >> README.md
+          echo "- **$(date '+%Y-%m-%d %H:%M')** — $MSG → **Level $NEW_LEVEL**" >> README.md
           echo "" >> README.md
-      
-      - name: Commit and push
+          
+          # Actualizar el nivel en el README
+          sed -i "s/Level [0-9]*/Level $NEW_LEVEL/g" README.md
+          
+          echo "EchoLoop evolucionó a Level $NEW_LEVEL"
+
+      - name: Commit the Evolution
         run: |
           git config user.name "EchoLoop"
           git config user.email "action@users.noreply.github.com"
           git add README.md
-          git commit -m "🔄 Auto-echo: El loop evolucionó solo"
+          git commit -m "🔄 EchoLoop → Level $NEW_LEVEL (Auto-evolución inteligente)"
           git push
