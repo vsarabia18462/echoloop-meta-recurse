@@ -1,3 +1,4 @@
+
 name: EchoLoop Advanced Evolution
 
 on:
@@ -9,19 +10,22 @@ on:
   pull_request:
     types: [opened]
 
+permissions:
+  contents: write
+
 jobs:
   evolve:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Evolve EchoLoop with Intelligence
         run: |
-          # Leer nivel actual (por defecto 8)
           CURRENT_LEVEL=$(grep -o 'Level [0-9]*' README.md | tail -1 | grep -o '[0-9]*' || echo 8)
           NEW_LEVEL=$((CURRENT_LEVEL + 1))
           
-          # Mensaje inteligente según el evento
           EVENT="${{ github.event_name }}"
           case $EVENT in
             watch)      MSG="Alguien activó el loop con una estrella. La inteligencia crece." ;;
@@ -31,12 +35,10 @@ jobs:
             *)          MSG="El loop evolucionó por sí solo." ;;
           esac
           
-          # Añadir echo inteligente
           echo "" >> README.md
           echo "- **$(date '+%Y-%m-%d %H:%M')** — $MSG → **Level $NEW_LEVEL**" >> README.md
           echo "" >> README.md
           
-          # Actualizar el nivel en el README
           sed -i "s/Level [0-9]*/Level $NEW_LEVEL/g" README.md
           
           echo "EchoLoop evolucionó a Level $NEW_LEVEL"
