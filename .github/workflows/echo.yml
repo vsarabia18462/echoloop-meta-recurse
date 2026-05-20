@@ -1,4 +1,4 @@
-name: EchoLoop Evolution (Issues)
+name: EchoLoop Simple
 
 on:
   watch:
@@ -8,28 +8,31 @@ on:
     types: [opened]
 
 jobs:
-  create-echo-issue:
+  create-issue:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Evolution Issue
+      - name: Create Echo Issue
         uses: actions/github-script@v7
         with:
           script: |
             const event = context.eventName;
-            let message = "";
-            
+            let title = "EchoLoop Evolution";
+            let body = "";
+
             if (event === "watch") {
-              message = "⭐ Alguien activó el loop con una estrella. La inteligencia sigue creciendo.";
+              title = "⭐ EchoLoop recibió una estrella";
+              body = "Alguien activó el loop. ¡La inteligencia sigue creciendo!";
             } else if (event === "fork") {
-              message = "🌿 Una nueva rama de conciencia se separó del tronco principal.";
+              title = "🌿 EchoLoop fue forkeado";
+              body = "Se creó una nueva rama del loop.";
             } else if (event === "issues") {
-              message = "💡 Una nueva idea entró en la recursión.";
+              title = "💡 Nueva idea en EchoLoop";
+              body = "Alguien abrió un issue. El loop se enriquece.";
             }
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `EchoLoop Evolution - Level ${Math.floor(Math.random() * 20) + 12}`,
-              body: `${message}\n\n**Evento:** ${event}\n**Fecha:** ${new Date().toISOString()}\n\nEl loop sigue vivo y creciendo.`
+              title: title,
+              body: body + "\n\n**Evento:** " + event + "\n**Fecha:** " + new Date().toISOString()
             });
-
