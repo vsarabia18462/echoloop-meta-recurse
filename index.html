@@ -13,71 +13,119 @@
       margin: 0; 
       padding: 20px; 
       text-align: center;
+      overflow: hidden;
     }
     h1 { margin: 20px 0 10px; font-size: 28px; }
     canvas { 
       border: 2px solid #30363d; 
       border-radius: 16px; 
       background: #161b22; 
-      box-shadow: 0 0 30px rgba(88, 166, 255, 0.15);
+      box-shadow: 0 0 40px rgba(88, 166, 255, 0.2);
       max-width: 100%;
+      cursor: pointer;
     }
     .meta { 
-      margin-top: 30px; 
+      margin-top: 20px; 
       font-size: 14px; 
       opacity: 0.7; 
       line-height: 1.6;
     }
+    .level-up {
+      margin-top: 15px;
+      padding: 10px 25px;
+      background: #58a6ff;
+      color: #0d1117;
+      border: none;
+      border-radius: 9999px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .level-up:hover {
+      background: #79b8ff;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
-  <h1>EchoLoop <span style="color:#58a6ff;">Level <span id="level">∞</span></span></h1>
+  <h1>EchoLoop <span style="color:#58a6ff;">Level <span id="level">8</span></span></h1>
   <canvas id="canvas" width="360" height="520"></canvas>
+  <button class="level-up" onclick="levelUp()">Level Up ⬆️</button>
   
   <div class="meta">
-    Every commit grows a new branch.<br>
-    This tree is alive because you started it at 11:44 PM on May 18, 2026.
+    Haz clic en el botón o en el árbol para subir de nivel<br>
+    Creado el 18 de mayo de 2026
   </div>
 
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    let depth = 8;
+    let targetDepth = 8;
+    let currentDepth = 8;
+    let animationFrame;
 
-    function drawTree(x, y, angle, currentDepth, length) {
-      if (currentDepth === 0) return;
+    function lerp(start, end, t) {
+      return start * (1 - t) + end * t;
+    }
 
-      ctx.strokeStyle = `hsl(${200 + currentDepth * 12}, 85%, 68%)`;
-      ctx.lineWidth = Math.max(1, currentDepth * 0.9);
-      ctx.shadowBlur = 8;
+    function drawTree(x, y, angle, depth, length, progress) {
+      if (depth <= 0) return;
+
+      const currentLength = length * progress;
+      
+      ctx.strokeStyle = `hsl(${200 + depth * 10}, 85%, 70%)`;
+      ctx.lineWidth = Math.max(1.5, depth * 0.8);
+      ctx.shadowBlur = 12;
       ctx.shadowColor = '#58a6ff';
 
       ctx.beginPath();
       ctx.moveTo(x, y);
-      const newX = x + Math.cos(angle) * length;
-      const newY = y - Math.sin(angle) * length;
+      const newX = x + Math.cos(angle) * currentLength;
+      const newY = y - Math.sin(angle) * currentLength;
       ctx.lineTo(newX, newY);
       ctx.stroke();
 
-      drawTree(newX, newY, angle - 0.42, currentDepth - 1, length * 0.68);
-      drawTree(newX, newY, angle + 0.42, currentDepth - 1, length * 0.68);
+      const newProgress = Math.min(1, progress + 0.08);
+      
+      drawTree(newX, newY, angle - 0.38, depth - 1, length * 0.72, newProgress);
+      drawTree(newX, newY, angle + 0.38, depth - 1, length * 0.72, newProgress);
     }
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawTree(180, 500, -Math.PI / 2, depth, 75);
       
-      document.getElementById('level').innerText = depth + Math.floor(Math.random() * 3);
+      // Suavizar el cambio de profundidad
+      currentDepth = lerp(currentDepth, targetDepth, 0.12);
       
-      requestAnimationFrame(animate);
+      drawTree(180, 480, -Math.PI / 2, Math.floor(currentDepth), 85, 1);
+      
+      document.getElementById('level').innerText = Math.floor(currentDepth);
+      
+      animationFrame = requestAnimationFrame(animate);
     }
 
+    function levelUp() {
+      targetDepth = Math.min(14, targetDepth + 1);
+      
+      // Efecto de pulso
+      canvas.style.transform = 'scale(1.03)';
+      setTimeout(() => {
+        canvas.style.transition = 'transform 0.4s ease';
+        canvas.style.transform = 'scale(1)';
+      }, 50);
+    }
+
+    // Clic en el canvas también sube nivel
+    canvas.addEventListener('click', levelUp);
+
+    // Iniciar animación
     animate();
     
-    // Easter egg: tap the canvas to increase recursion depth
-    canvas.addEventListener('click', () => {
-      depth = Math.min(12, depth + 1);
-    });
+    // Mensaje de bienvenida
+    setTimeout(() => {
+      console.log('%c[EchoLoop] Visualizador con animaciones suaves cargado', 'color:#58a6ff');
+    }, 1000);
   </script>
 </body>
 </html>
