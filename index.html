@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EchoLoop • Recursive Tree</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    body { 
+      background: #0d1117; 
+      color: #c9d1d9; 
+      font-family: 'Inter', system-ui, sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+      text-align: center;
+    }
+    h1 { margin: 20px 0 10px; font-size: 28px; }
+    canvas { 
+      border: 2px solid #30363d; 
+      border-radius: 16px; 
+      background: #161b22; 
+      box-shadow: 0 0 30px rgba(88, 166, 255, 0.15);
+      max-width: 100%;
+    }
+    .meta { 
+      margin-top: 30px; 
+      font-size: 14px; 
+      opacity: 0.7; 
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>EchoLoop <span style="color:#58a6ff;">Level <span id="level">∞</span></span></h1>
+  <canvas id="canvas" width="360" height="520"></canvas>
+  
+  <div class="meta">
+    Every commit grows a new branch.<br>
+    This tree is alive because you started it at 11:44 PM on May 18, 2026.
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let depth = 8;
+
+    function drawTree(x, y, angle, currentDepth, length) {
+      if (currentDepth === 0) return;
+
+      ctx.strokeStyle = `hsl(${200 + currentDepth * 12}, 85%, 68%)`;
+      ctx.lineWidth = Math.max(1, currentDepth * 0.9);
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = '#58a6ff';
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      const newX = x + Math.cos(angle) * length;
+      const newY = y - Math.sin(angle) * length;
+      ctx.lineTo(newX, newY);
+      ctx.stroke();
+
+      drawTree(newX, newY, angle - 0.42, currentDepth - 1, length * 0.68);
+      drawTree(newX, newY, angle + 0.42, currentDepth - 1, length * 0.68);
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawTree(180, 500, -Math.PI / 2, depth, 75);
+      
+      document.getElementById('level').innerText = depth + Math.floor(Math.random() * 3);
+      
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+    
+    // Easter egg: tap the canvas to increase recursion depth
+    canvas.addEventListener('click', () => {
+      depth = Math.min(12, depth + 1);
+    });
+  </script>
+</body>
+</html>
