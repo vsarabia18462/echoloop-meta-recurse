@@ -1,12 +1,10 @@
-name: EchoLoop Advanced Evolution
+name: EchoLoop Simple Evolution
 
 on:
   watch:
     types: [started]
   fork:
   issues:
-    types: [opened]
-  pull_request:
     types: [opened]
 
 jobs:
@@ -17,33 +15,28 @@ jobs:
         with:
           token: ${{ secrets.REPO_TOKEN }}
 
-      - name: Evolve EchoLoop with Intelligence
+      - name: Add Echo and Increase Level
         run: |
-          CURRENT_LEVEL=$(grep -o 'Level [0-9]*' README.md | tail -1 | grep -o '[0-9]*' || echo 8)
-          NEW_LEVEL=$((CURRENT_LEVEL + 1))
+          # Leer nivel actual
+          LEVEL=$(grep -o 'Level [0-9]*' README.md | tail -1 | grep -o '[0-9]*' || echo 8)
+          NEW_LEVEL=$((LEVEL + 1))
           
-          EVENT="${{ github.event_name }}"
-          case $EVENT in
-            watch)      MSG="Alguien activó el loop con una estrella. La inteligencia crece." ;;
-            fork)       MSG="Una nueva rama de conciencia se separó del tronco principal." ;;
-            issues)     MSG="Una nueva idea entró en la recursión." ;;
-            pull_request) MSG="Una fusión de pensamiento enriqueció el loop." ;;
-            *)          MSG="El loop evolucionó por sí solo." ;;
-          esac
-          
+          # Añadir nuevo echo
           echo "" >> README.md
-          echo "- **$(date '+%Y-%m-%d %H:%M')** — $MSG → **Level $NEW_LEVEL**" >> README.md
+          echo "- **$(date '+%Y-%m-%d %H:%M')** — El loop evolucionó → **Level $NEW_LEVEL**" >> README.md
           echo "" >> README.md
           
+          # Actualizar nivel
           sed -i "s/Level [0-9]*/Level $NEW_LEVEL/g" README.md
           
-          echo "EchoLoop evolucionó a Level $NEW_LEVEL"
+          echo "Nuevo nivel: $NEW_LEVEL"
 
-      - name: Commit the Evolution
+      - name: Commit Changes
         run: |
           git config user.name "EchoLoop"
           git config user.email "action@users.noreply.github.com"
           git add README.md
-          git commit -m "🔄 EchoLoop → Level $NEW_LEVEL (Auto-evolución inteligente)"
+          git commit -m "🔄 EchoLoop Level $NEW_LEVEL"
           git push
+          
 
