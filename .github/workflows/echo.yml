@@ -1,4 +1,4 @@
-name: EchoLoop Simple Evolution
+name: EchoLoop Evolution (Issues)
 
 on:
   watch:
@@ -8,35 +8,28 @@ on:
     types: [opened]
 
 jobs:
-  evolve:
+  create-echo-issue:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Create Evolution Issue
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.REPO_TOKEN }}
-
-      - name: Add Echo and Increase Level
-        run: |
-          # Leer nivel actual
-          LEVEL=$(grep -o 'Level [0-9]*' README.md | tail -1 | grep -o '[0-9]*' || echo 8)
-          NEW_LEVEL=$((LEVEL + 1))
-          
-          # Añadir nuevo echo
-          echo "" >> README.md
-          echo "- **$(date '+%Y-%m-%d %H:%M')** — El loop evolucionó → **Level $NEW_LEVEL**" >> README.md
-          echo "" >> README.md
-          
-          # Actualizar nivel
-          sed -i "s/Level [0-9]*/Level $NEW_LEVEL/g" README.md
-          
-          echo "Nuevo nivel: $NEW_LEVEL"
-
-      - name: Commit Changes
-        run: |
-          git config user.name "EchoLoop"
-          git config user.email "action@users.noreply.github.com"
-          git add README.md
-          git commit -m "🔄 EchoLoop Level $NEW_LEVEL"
-          git push
-          
+          script: |
+            const event = context.eventName;
+            let message = "";
+            
+            if (event === "watch") {
+              message = "⭐ Alguien activó el loop con una estrella. La inteligencia sigue creciendo.";
+            } else if (event === "fork") {
+              message = "🌿 Una nueva rama de conciencia se separó del tronco principal.";
+            } else if (event === "issues") {
+              message = "💡 Una nueva idea entró en la recursión.";
+            }
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `EchoLoop Evolution - Level ${Math.floor(Math.random() * 20) + 12}`,
+              body: `${message}\n\n**Evento:** ${event}\n**Fecha:** ${new Date().toISOString()}\n\nEl loop sigue vivo y creciendo.`
+            });
 
