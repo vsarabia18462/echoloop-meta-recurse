@@ -17,6 +17,7 @@ jobs:
       - name: Create Echo Issue
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.REPO_TOKEN }}
           script: |
             const event = context.eventName;
             let title = "EchoLoop Evolution";
